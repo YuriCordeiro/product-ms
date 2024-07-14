@@ -36,9 +36,9 @@ export class ProductController {
   }
 
   @Get('/id/:productId')
-  getProductById(@Param('productId') productId: string): Promise<Product> {
+  async getProductById(@Param('productId') productId: string): Promise<Product> {
     this.logger.log(`getProductById(string) - Start`);
-    return this.productUseCases.getProductById(productId);
+    return await this.productUseCases.getProductById(productId);
   }
 
   @Get('/sku/:productSku')
@@ -68,6 +68,6 @@ export class ProductController {
   @Delete('/:productId')
   async deleteProduct(@Param('productId') productId: string): Promise<void> {
     this.logger.log(`deleteProduct(String) - Start`);
-    return this.productUseCases.deleteProduct(productId);
+    return await this.productUseCases.deleteProduct(productId);
   }
 }
