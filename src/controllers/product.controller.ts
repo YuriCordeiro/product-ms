@@ -41,6 +41,12 @@ export class ProductController {
     return this.productUseCases.getProductById(productId);
   }
 
+  @Get('/sku/:productSku')
+  getProductBySKU(@Param('productSku') productSku: string): Promise<Product> {
+    this.logger.log(`getProductBySKU(string) - Start`);
+    return this.productUseCases.getProductBySku(productSku);
+  }
+
   @Get('/category/:category')
   async getProductByCategory(
     @Param('category') category: string,

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Inject,
   Injectable,
   NotFoundException,
@@ -11,6 +12,7 @@ import { Product } from 'src/frameworks/data-services/mongo/entities/product.mod
 
 @Injectable()
 export class ProductUseCases {
+
   constructor(
     private dataServices: IDataServices,
     private productFactoryService: ProductFactoryService
@@ -43,7 +45,16 @@ export class ProductUseCases {
     return this.dataServices.products.getProductByCategory(category);
   }
 
-  createProduct(productDTO: ProductDTO): Promise<Product> {
+  getProductBySku(productSku: string): Promise<Product> {
+    return this.dataServices.products.getBySku(productSku);
+  }
+
+  async createProduct(productDTO: ProductDTO): Promise<Product> {
+    const productSKU = productDTO.sku;
+    const foundProduct = await this.getProductBySku(productSKU);
+    if (foundProduct != null) {
+      throw new ConflictException(`There was another product with SKU: ${productSKU}. Try to change it and try again.`);
+    }
     const newProduct = this.productFactoryService.createNewProduct(productDTO);
     return this.dataServices.products.create(newProduct);
   }
