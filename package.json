@@ -63,15 +63,30 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "src/**/*.{ts,tsx}",
+      "!src/main.ts",
+      "!src/**/*.module.ts",
+      "!src/core/abstracts/generic-repository.abstract.ts",
+      "!src/frameworks/data-services/mongo/mongo-data-services.service.ts",
+      "!src/frameworks/data-services/mongo/entities/product.model.ts",
+      "!src/use-cases/product/product-factory.service.ts",
+      "!src/controllers/app.controller.ts"
     ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "coverageDirectory": "./coverage",
+    "collectCoverage": true,
+    "coverageReporters": [
+      "text",
+      "lcov"
+    ],
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/src/$1"
+    }
   }
 }

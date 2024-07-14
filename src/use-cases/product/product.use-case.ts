@@ -20,7 +20,7 @@ export class ProductUseCases {
     return this.dataServices.products.getAll();
   }
 
-  private isProductValid(foundProduct: Promise<Product>, id: string) {
+  private isProductValid(foundProduct: Product, id: string) {
     if (foundProduct != null) {
       return foundProduct;
     } else {
@@ -30,9 +30,9 @@ export class ProductUseCases {
     }
   }
 
-  getProductById(id: string): Promise<Product> {
+  async getProductById(id: string): Promise<Product> {
     if (id.match(/^[0-9a-fA-F]{24}$/)) {
-      const foundProduct = this.dataServices.products.get(id);
+      const foundProduct = await this.dataServices.products.get(id);
       return this.isProductValid(foundProduct, id);
     } else {
       throw new BadRequestException(`'${id}' is not a valid ObjectID`);
@@ -53,8 +53,8 @@ export class ProductUseCases {
     return this.dataServices.products.update(productId, newProduct);
   }
 
-  deleteProduct(productId: string) {
-    const foundProduct = this.getProductById(productId);
+  async deleteProduct(productId: string) {
+    const foundProduct = await this.getProductById(productId);
     this.isProductValid(foundProduct, productId);
     this.dataServices.products.delete(productId);
   }
