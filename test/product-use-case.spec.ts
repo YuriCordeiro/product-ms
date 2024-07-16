@@ -14,6 +14,7 @@ const mockDataServices = () => ({
     create: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
+    getBySku: jest.fn(),
   },
 });
 
@@ -110,6 +111,7 @@ describe('ProductUseCases', () => {
       const product = { _id: 'product123', ...productDTO } as Product;
       productFactoryService.createNewProduct.mockReturnValue(product);
       dataServices.products.create.mockResolvedValue(product);
+      dataServices.products.getBySku.mockResolvedValue(null);
 
       const result = await productUseCases.createProduct(productDTO);
       expect(result).toEqual(product);
