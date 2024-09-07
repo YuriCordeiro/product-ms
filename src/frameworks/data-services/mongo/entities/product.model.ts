@@ -13,8 +13,6 @@ export class Product {
   @Prop()
   value: number;
   @Prop()
-  quantity: number;
-  @Prop()
   description: string;
 }
 

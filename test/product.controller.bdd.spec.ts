@@ -2,7 +2,7 @@ import { defineFeature, loadFeature } from 'jest-cucumber';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductController } from 'src/controllers/product.controller';
 import { ProductUseCases } from 'src/use-cases/product/product.use-case';
-import { ProductDTO } from 'src/dto/product.dto';
+import { GetProductDTO } from 'src/dto/get-product.dto';
 import { Product } from 'src/frameworks/data-services/mongo/entities/product.model';
 
 const feature = loadFeature('./test/product.feature');
@@ -33,11 +33,11 @@ defineFeature(feature, test => {
   });
 
   test('Create a new product', ({ given, when, then }) => {
-    let productDTO: ProductDTO;
+    let productDTO: GetProductDTO;
     let product: Product;
 
     given('I have a product', () => {
-      productDTO = { name: 'Hamburger', description: 'Delicious Burger', price: 30 } as unknown as ProductDTO;
+      productDTO = { name: 'Hamburger', description: 'Delicious Burger', price: 30 } as unknown as GetProductDTO;
     });
 
     when('I create the product', async () => {

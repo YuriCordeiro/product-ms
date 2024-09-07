@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class ProductDTO {
+export class GetProductStockDTO {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -21,11 +21,6 @@ export class ProductDTO {
   @IsNumber()
   @IsNotEmpty()
   readonly value: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  readonly quantity: number;
 
   @ApiProperty()
   @IsString()

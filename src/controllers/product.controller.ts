@@ -12,9 +12,10 @@ import {
   Put,
 } from '@nestjs/common';
 import { ProductUseCases } from 'src/use-cases/product/product.use-case';
-import { ProductDTO } from 'src/dto/product.dto';
+import { GetProductDTO } from 'src/dto/get-product.dto';
 import { Product } from 'src/frameworks/data-services/mongo/entities/product.model';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateProductDTO } from 'src/dto/create-product.dto';
 
 @ApiTags('Products')
 @Controller('/products')
@@ -24,8 +25,8 @@ export class ProductController {
   constructor(private productUseCases: ProductUseCases) { }
 
   @Post()
-  async createProduct(@Body() ProductDTO: ProductDTO): Promise<Product> {
-    this.logger.log(`createProduct(ProductDTO) - Start`);
+  async createProduct(@Body() ProductDTO: CreateProductDTO): Promise<Product> {
+    this.logger.log(`createProduct(CreateProductDTO) - Start`);
     return this.productUseCases.createProduct(ProductDTO);
   }
 
@@ -58,7 +59,7 @@ export class ProductController {
   @Put('/:productId')
   async updateProduct(
     @Param('productId') productId: string,
-    @Body() productDTO: ProductDTO,
+    @Body() productDTO: CreateProductDTO,
   ): Promise<Product> {
     this.logger.log(`updateProduct(string, ProductDTO) - Start`);
     return this.productUseCases.updateProduct(productId, productDTO);
