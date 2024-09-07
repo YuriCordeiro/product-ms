@@ -44,10 +44,6 @@ export class InventoryUseCase {
 //   credentials: {
 //     accessKeyId: accessKeyId,
 //     secretAccessKey: secretAccessKey
-//   // region: "us-east-1",
-//   // credentials: {
-//   //   accessKeyId: "AKIA6GBMCKINQ5ULU2W4",
-//   //   secretAccessKey: "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"
 //   }
 // });
 
