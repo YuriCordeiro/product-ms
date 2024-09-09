@@ -4,9 +4,6 @@ import { InventoryFactoryService } from "./inventory-factory.service";
 import { InventoryDTO } from "src/dto/inventory.dto";
 import { Inventory } from "src/frameworks/data-services/mongo/entities/inventory.model";
 import { CreateProductDTO } from "src/dto/create-product.dto";
-import { SQS } from "aws-sdk";
-import { ConfigModule, ConfigObject } from "@nestjs/config";
-import { access } from "fs";
 
 @Injectable()
 export class InventoryUseCase {
@@ -18,8 +15,6 @@ export class InventoryUseCase {
         private inventoryFactoryService: InventoryFactoryService
       ) { }
 
-      //TODO: Validar usabilidade de fila NEW_PRODUCT ou PRODUCT_EVENT que atualiza a quantidade de produtos no estoque
-      // Faz sentido para o mesmo MS? Acho que não.
       async createProductInventory(productDTO: CreateProductDTO): Promise<Inventory> {
         this.logger.log(`createProductInventory(CreateProductDTO) - Adding ${productDTO.quantity}x - '${productDTO.name}' to inventory.`);
         let inventoryDTO = new InventoryDTO();
@@ -33,53 +28,21 @@ export class InventoryUseCase {
       async getAllProductInventories(): Promise<Inventory[]> {
         return await this.dataServices.inventories.getAll();
       }
+
+      async updateInventory(inventoryId: string, inventory: Inventory) {
+        return await this.dataServices.inventories.update(inventoryId, inventory);
+      }
+
+      async bookProduct(product: CreateProductDTO) {
+        return await this.dataServices.inventories.getAll().then(inventories => {
+          inventories.filter(inventory => {
+            inventory.product.sku = product.sku
+          }).map(foundInventory => {
+            this.logger.log(`found inventory: ${foundInventory}`);
+            foundInventory.totalReserved += product.quantity
+            this.logger.log(`inventory updated: ${foundInventory}`);
+          });
+        });
+        
+      }
 }
-
-// const region = process.env.SQS_REGION;
-// const accessKeyId = process.env.SQS_ACCESS_KEY_ID;
-// const secretAccessKey = process.env.SQS_SECRET_ACCESS_KEY
-
-// const sqs = new SQS({
-//   region: region,
-//   credentials: {
-//     accessKeyId: accessKeyId,
-//     secretAccessKey: secretAccessKey
-//   }
-// });
-
-// // const sqs = new SQS(configObject);
-
-// const receiveMessages = async () => {
-//   const params = {
-//     // QueueUrl: process.env.SQS_URL,
-//     QueueUrl: "https://sqs.us-east-1.amazonaws.com/975050002971/NEW_ORDER",
-//     MaxNumberOfMessages: 10,
-//     VisibilityTimeout: 20, // 20 seconds
-//     WaitTimeSeconds: 0,
-//   };
-
-//   try {
-//     const data = await sqs.receiveMessage(params).promise();
-//     return data.Messages || [];
-//   } catch (err) {
-//     console.error("Error", err);
-//     throw err;
-//   }
-// };
-
-// const processMessages = async (messages) => {
-//   for (const message of messages) {
-//     console.log("Received message:", message.Body);
-
-//     // Delete the message
-//     const deleteParams = {
-//       // QueueUrl: process.env.SQS_URL,
-//       QueueUrl: "https://sqs.us-east-1.amazonaws.com/975050002971/NEW_ORDER",
-//       ReceiptHandle: message.ReceiptHandle,
-//     };
-//     await sqs.deleteMessage(deleteParams).promise();
-//   }
-// };
-
-// // Example usage
-// receiveMessages().then(processMessages);
