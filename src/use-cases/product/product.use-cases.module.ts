@@ -5,11 +5,11 @@ import { ProductFactoryService } from './product-factory.service';
 import { InventoryUseCase } from '../inventory/inventory.use-case';
 import { ConfigModule } from '@nestjs/config';
 import { InventoryFactoryService } from '../inventory/inventory-factory.service';
-import { SQSConsumerService } from 'src/frameworks/messaging-services/sqs-messaging-services.service';
+import { SQSProducerService } from 'src/frameworks/messaging-services/sqs-messaging-services.service';
 
 @Module({
   imports: [DataServicesModule, ConfigModule.forRoot()],
-  providers: [ProductFactoryService, ProductUseCases, InventoryUseCase, InventoryFactoryService, SQSConsumerService],
-  exports: [ProductFactoryService, ProductUseCases, InventoryUseCase, InventoryFactoryService, SQSConsumerService],
+  providers: [ProductFactoryService, ProductUseCases, InventoryUseCase, InventoryFactoryService, SQSProducerService],
+  exports: [ProductFactoryService, ProductUseCases, InventoryUseCase, InventoryFactoryService, SQSProducerService],
 })
 export class ProductUseCaseModule {}

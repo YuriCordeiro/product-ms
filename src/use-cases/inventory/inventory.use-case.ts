@@ -4,6 +4,8 @@ import { InventoryFactoryService } from "./inventory-factory.service";
 import { InventoryDTO } from "src/dto/inventory.dto";
 import { Inventory } from "src/frameworks/data-services/mongo/entities/inventory.model";
 import { CreateProductDTO } from "src/dto/create-product.dto";
+import { JOB_TYPES, SQSProducerService } from "src/frameworks/messaging-services/sqs-messaging-services.service";
+import { CreateChargeDTO } from "src/dto/create-charge.dto";
 
 @Injectable()
 export class InventoryUseCase {
@@ -12,7 +14,8 @@ export class InventoryUseCase {
 
     constructor(
         private dataServices: IDataServices,
-        private inventoryFactoryService: InventoryFactoryService
+        private inventoryFactoryService: InventoryFactoryService,
+        private producerService: SQSProducerService
       ) { }
 
       async createProductInventory(productDTO: CreateProductDTO): Promise<Inventory> {
@@ -33,16 +36,39 @@ export class InventoryUseCase {
         return await this.dataServices.inventories.update(inventoryId, inventory);
       }
 
-      async bookProduct(product: CreateProductDTO) {
-        return await this.dataServices.inventories.getAll().then(inventories => {
-          inventories.filter(inventory => {
-            inventory.product.sku = product.sku
-          }).map(foundInventory => {
-            this.logger.log(`found inventory: ${foundInventory}`);
-            foundInventory.totalReserved += product.quantity
-            this.logger.log(`inventory updated: ${foundInventory}`);
-          });
-        });
-        
+      async bookProducts(productList: CreateProductDTO[]) {
+        this.logger.log("bookProducts(CreateProductDTO[]) - Start");
+        this.getAllProductInventories()
+          .then(inventories => {
+              productList.forEach(product => { // For each product
+                  inventories.filter(items => { // Find the self repository by product SKU
+                      return items.product.sku = product.sku
+                  }).map(productInventory => { // Update the fields 'totalReserved' and 'totalAvailable' based on 'product.quantity' field
+                      productInventory.totalReserved += product.quantity;
+                      productInventory.totalAvailable -= product.quantity;
+                      return productInventory;
+                  }).flatMap(updatedInventory => this.updateInventory(updatedInventory.id, updatedInventory)); // update the current updtated inventory
+              })
+        })
+          .finally(() => this.logger.log("Products has been booked and inventories has been successfully updated."));
+      }
+
+      createNewCharge(createChargeDTO: CreateChargeDTO) {
+        this.logger.log("createNewCharge(CreateChargeDTO) - Start");
+        const totalOrderAmount = this.sumTotalChargeAmount(createChargeDTO.products);
+        const chargeMessageObject = {
+          orderId: createChargeDTO.orderId,
+          cartId: createChargeDTO.cartId,
+          totalOrderAmount: totalOrderAmount
+      }
+      const sendMessage = JSON.stringify(chargeMessageObject);
+      this.logger.log(`Built Charge Message: ${sendMessage}`);
+      this.producerService.sendNewCharge(chargeMessageObject, JOB_TYPES.NEW_CHARGE);
+      }
+
+      sumTotalChargeAmount(products: CreateProductDTO[]) {
+        return products
+          .map(p => p.value * p.quantity)
+          .reduce((partialSum, a) => partialSum + a, 0);
       }
 }

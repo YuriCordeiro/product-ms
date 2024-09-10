@@ -3,7 +3,7 @@ import { DataServicesModule } from "src/services/data-services.module";
 import { InventoryUseCase } from "./inventory.use-case";
 import { InventoryFactoryService } from "./inventory-factory.service";
 import { SqsModule } from "@ssut/nestjs-sqs";
-import { SQSConsumerService } from "src/frameworks/messaging-services/sqs-messaging-services.service";
+import { SQSProducerService } from "src/frameworks/messaging-services/sqs-messaging-services.service";
 import { MessageHandler } from "src/frameworks/messaging-services/sqs-message-handler";
 import {SQSClient} from '@aws-sdk/client-sqs';
 
@@ -29,8 +29,8 @@ import {SQSClient} from '@aws-sdk/client-sqs';
         producers: []
     }),
 ],
-    providers: [InventoryFactoryService, InventoryUseCase, SQSConsumerService, MessageHandler],
-    exports: [InventoryFactoryService, InventoryUseCase, SQSConsumerService, MessageHandler],
+    providers: [InventoryFactoryService, InventoryUseCase, SQSProducerService, MessageHandler],
+    exports: [InventoryFactoryService, InventoryUseCase, SQSProducerService, MessageHandler],
   })
   export class InventoryUseCaseModule {}
   
