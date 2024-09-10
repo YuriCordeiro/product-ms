@@ -27,10 +27,6 @@ export class MessageHandler {
 
     try {
       const strMessage = JSON.stringify(msgBody.message);
-
-    //   this.logger.log(`This is the message: ${strMessage}`); // Log the message
-
-      // const productList: CreateProductDTO[] = JSON.parse(strMessage) as CreateProductDTO[];
       const chargeMessage: CreateChargeDTO = JSON.parse(strMessage) as CreateChargeDTO;
       const productList = chargeMessage.products;
 
@@ -38,32 +34,6 @@ export class MessageHandler {
           .bookProducts(productList)
             .then(() => this.inventoryService.createNewCharge(chargeMessage))
             .finally(() => this.logger.log(`New charge has been created based on order: '${chargeMessage.orderId}'`));
-        // .finally(() => this.logger.log(`New charge has been created based on order: '${chargeMessage.orderId}'`));
-
-      // this.inventoryService.getAllProductInventories()
-      //   .then(inventories => {
-      //       productList.forEach(product => { // For each product
-      //           inventories.filter(items => { // Find the self repository by product SKU
-      //               return items.product.sku = product.sku
-      //           }).map(productInventory => { // Update the fields 'totalReserved' and 'totalAvailable' based on 'product.quantity' field
-      //               productInventory.totalReserved += product.quantity;
-      //               productInventory.totalAvailable -= product.quantity;
-      //               return productInventory;
-      //           }).flatMap(updatedInventory => this.inventoryService.updateInventory(updatedInventory.id, updatedInventory)); // update the current updtated inventory
-      //       })
-      // }).then(() => {
-      //   const sendChargeMessage = {
-      //     orderId: newChargeMessage.orderId,
-      //     cartId: newChargeMessage.cartId,
-      //     orderTotalAmount: newChargeMessage.products.map(p => p.quantity).reduce((partialSum, a) => partialSum + a, 0)
-      // }
-
-    //   this.logger.log(`Built Charge Message: ${sendChargeMessage}`);
-    //   })
-    //   .finally(() => {
-    //     this.logger.log("Products has been booked and inventories has been successfully updated.");
-    // });
-
     } catch (error) {
       console.log('consumer error', JSON.stringify(error));
       //keep the message in sqs
