@@ -56,7 +56,8 @@ jobs:
           kubectl create secret generic mongo-credentials \
             --from-literal=MONGO_CONNECTION_STRING=${{ secrets.MONGO_CONNECTION_STRING }} \
             -n nginx \
-            --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify --validate=false
+            --dry-run=client -o yaml | kubectl apply -f k8s/cloud/ --insecure-skip-tls-verify --validate=false
+            # --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify --validate=false
 
     - name: Create SQS Secret
       run: |
@@ -64,7 +65,8 @@ jobs:
             --from-literal=SQS_ACCESS_KEY_ID=${{ secrets.SQS_ACCESS_KEY_ID }} \
             --from-literal=SQS_SECRET_ACCESS_KEY=${{ secrets.SQS_SECRET_ACCESS_KEY }} \
             -n nginx \
-            --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify --validate=false
+            --dry-run=client -o yaml | kubectl apply -f k8s/cloud/ --insecure-skip-tls-verify --validate=false
+            # --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify --validate=false
     
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
