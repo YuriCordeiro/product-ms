@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-ms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: product-ms
+  template:
+    metadata:
+      labels:
+        app: product-ms
+    spec:
+      containers:
+      - name: product-ms
+        image: 975050002971.dkr.ecr.us-east-1.amazonaws.com/product-ms:latest
+        ports:
+        - containerPort: 3000
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 60
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 15
+        resources:
+          requests:
+            cpu: 10m
+        imagePullPolicy: Always
+        # env:
+        #   - name: MONGO_CONNECTION_STRING
+        #     valueFrom:
+        #       configMapKeyRef:
+        #         name: mongo-credentials
+        #         key: MONGO_CONNECTION_STRING
+        #   - name: SQS_ACCESS_KEY_ID
+        #     valueFrom:
+        #       configMapKeyRef:
+        #         name: sqs-credentials
+        #         key: SQS_ACCESS_KEY_ID
+        #   - name: SQS_SECRET_ACCESS_KEY
+        #     valueFrom:
+        #       configMapKeyRef:
+        #         name: sqs-credentials
+        #         key: SQS_SECRET_ACCESS_KEY
+                
+        #   - name: SQS_URL
+        #     value: "https://sqs.us-east-1.amazonaws.com/975050002971/NEW_ORDER"
+        #   - name: SQS_NEW_CHARGE_URL
+        #     value: "https://sqs.us-east-1.amazonaws.com/975050002971/NEW_CHARGE"
+        #   - name: SQS_REGION
+        #     value: "us-east-1"     
+        #   - name: SQS_QUEUE_NAME
+        #     value: "NEW_ORDER"
+          
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-product-ms
+spec:
+  type: LoadBalancer
+  selector:
+    app: product-ms
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
