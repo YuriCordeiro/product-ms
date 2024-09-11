@@ -101,6 +101,13 @@ jobs:
         EKS_CLUSTER_NAME: 'order-manager'
       run: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region ${{ env.AWS_REGION }}
 
+    - name: Set k8s context
+      uses: azure/k8s-set-context@v4
+      with:
+         method: service-account
+         k8s-url: 'https://5FC85553693A9FB969B879E43B276ECA.gr7.us-east-1.eks.amazonaws.com'
+         k8s-secret: ${{ secrets.SQS_SECRET_ACCESS_KEY }}
+
     - name: Create SQS Access Key Id
       uses: Azure/k8s-create-secret@v4.0
       with:
