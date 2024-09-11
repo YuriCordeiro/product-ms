@@ -32,31 +32,31 @@ spec:
           requests:
             cpu: 10m
         imagePullPolicy: Always
-        env:
-          - name: MONGO_CONNECTION_STRING
-            valueFrom:
-              configMapKeyRef:
-                name: mongo-credentials
-                key: MONGO_CONNECTION_STRING
-          - name: SQS_ACCESS_KEY_ID
-            valueFrom:
-              configMapKeyRef:
-                name: sqs-credentials
-                key: SQS_ACCESS_KEY_ID
-          - name: SQS_SECRET_ACCESS_KEY
-            valueFrom:
-              configMapKeyRef:
-                name: sqs-credentials
-                key: SQS_SECRET_ACCESS_KEY
+        # env:
+        #   - name: MONGO_CONNECTION_STRING
+        #     valueFrom:
+        #       configMapKeyRef:
+        #         name: mongo-credentials
+        #         key: MONGO_CONNECTION_STRING
+        #   - name: SQS_ACCESS_KEY_ID
+        #     valueFrom:
+        #       configMapKeyRef:
+        #         name: sqs-credentials
+        #         key: SQS_ACCESS_KEY_ID
+        #   - name: SQS_SECRET_ACCESS_KEY
+        #     valueFrom:
+        #       configMapKeyRef:
+        #         name: sqs-credentials
+        #         key: SQS_SECRET_ACCESS_KEY
                 
-          - name: SQS_URL
-            value: "https://sqs.us-east-1.amazonaws.com/975050002971/NEW_ORDER"
-          - name: SQS_NEW_CHARGE_URL
-            value: "https://sqs.us-east-1.amazonaws.com/975050002971/NEW_CHARGE"
-          - name: SQS_REGION
-            value: "us-east-1"     
-          - name: SQS_QUEUE_NAME
-            value: "NEW_ORDER"
+        #   - name: SQS_URL
+        #     value: "https://sqs.us-east-1.amazonaws.com/975050002971/NEW_ORDER"
+        #   - name: SQS_NEW_CHARGE_URL
+        #     value: "https://sqs.us-east-1.amazonaws.com/975050002971/NEW_CHARGE"
+        #   - name: SQS_REGION
+        #     value: "us-east-1"     
+        #   - name: SQS_QUEUE_NAME
+        #     value: "NEW_ORDER"
           
 
 ---
