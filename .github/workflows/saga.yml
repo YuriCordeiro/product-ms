@@ -58,25 +58,22 @@ jobs:
         aws-secret-access-key: ${{ secrets.SQS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
-    - name: Show directory files
-      run: ls -ltr
+    # - name: Create Mongo Secret
+    #   run: |
+    #       kubectl create secret generic mongo-credentials \
+    #         --from-literal=MONGO_CONNECTION_STRING=${{ secrets.MONGO_CONNECTION_STRING }} \
+    #         -n nginx \
+    #         --dry-run=client -o yaml | kubectl apply -f k8s/cloud/ --insecure-skip-tls-verify --validate=false
+    #         # --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify --validate=false
 
-    - name: Create Mongo Secret
-      run: |
-          kubectl create secret generic mongo-credentials \
-            --from-literal=MONGO_CONNECTION_STRING=${{ secrets.MONGO_CONNECTION_STRING }} \
-            -n nginx \
-            --dry-run=client -o yaml | kubectl apply -f k8s/cloud/ --insecure-skip-tls-verify --validate=false
-            # --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify --validate=false
-
-    - name: Create SQS Secret
-      run: |
-          kubectl create secret generic sqs-credentials \
-            --from-literal=SQS_ACCESS_KEY_ID=${{ secrets.SQS_ACCESS_KEY_ID }} \
-            --from-literal=SQS_SECRET_ACCESS_KEY=${{ secrets.SQS_SECRET_ACCESS_KEY }} \
-            -n nginx \
-            --dry-run=client -o yaml | kubectl apply -f k8s/cloud/ --insecure-skip-tls-verify --validate=false
-            # --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify --validate=false
+    # - name: Create SQS Secret
+    #   run: |
+    #       kubectl create secret generic sqs-credentials \
+    #         --from-literal=SQS_ACCESS_KEY_ID=${{ secrets.SQS_ACCESS_KEY_ID }} \
+    #         --from-literal=SQS_SECRET_ACCESS_KEY=${{ secrets.SQS_SECRET_ACCESS_KEY }} \
+    #         -n nginx \
+    #         --dry-run=client -o yaml | kubectl apply -f k8s/cloud/ --insecure-skip-tls-verify --validate=false
+    #         # --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify --validate=false
 
     - name: Amazon ECR "Login" Action for GitHub Actions
       id: login-ecr
@@ -103,6 +100,42 @@ jobs:
       env:
         EKS_CLUSTER_NAME: 'order-manager'
       run: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region ${{ env.AWS_REGION }}
+
+    - name: Create SQS Access Key Id
+      uses: Azure/k8s-create-secret@v4.0
+      with:
+        # Choose the target Kubernetes namespace. If the namespace is not provided, the commands will run in the default namespace.
+        namespace: 'default'
+        # Type of Kubernetes secret. Defaults to 'kubernetes.io/dockerconfigjson'.
+        secret-type: 'generic'
+        # Name of the secret. You can use this secret name in the Kubernetes YAML configuration file.
+        secret-name: SQS_ACCESS_KEY_ID
+        # JSON object with the serialized form of the secret data in a base64 encoded string ex: {"key1":"[base64 encoded data]"}
+        data: ${{ secrets.SQS_ACCESS_KEY_ID }}
+
+    - name: Create SQS Secret Access Key
+      uses: Azure/k8s-create-secret@v4.0
+      with:
+        # Choose the target Kubernetes namespace. If the namespace is not provided, the commands will run in the default namespace.
+        namespace: 'default'
+        # Type of Kubernetes secret. Defaults to 'kubernetes.io/dockerconfigjson'.
+        secret-type: 'generic'
+        # Name of the secret. You can use this secret name in the Kubernetes YAML configuration file.
+        secret-name: SQS_SECRET_ACCESS_KEY
+        # JSON object with the serialized form of the secret data in a base64 encoded string ex: {"key1":"[base64 encoded data]"}
+        data: ${{ secrets.SQS_SECRET_ACCESS_KEY }}
+
+    - name: Create Mongo Credentials Secret
+      uses: Azure/k8s-create-secret@v4.0
+      with:
+        # Choose the target Kubernetes namespace. If the namespace is not provided, the commands will run in the default namespace.
+        namespace: 'default'
+        # Type of Kubernetes secret. Defaults to 'kubernetes.io/dockerconfigjson'.
+        secret-type: 'generic'
+        # Name of the secret. You can use this secret name in the Kubernetes YAML configuration file.
+        secret-name: MONGO_CONNECTION_STRING
+        # JSON object with the serialized form of the secret data in a base64 encoded string ex: {"key1":"[base64 encoded data]"}
+        data: ${{ secrets.MONGO_CONNECTION_STRING }}
 
     - name: Deploy to EKS
       env:
