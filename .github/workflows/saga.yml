@@ -101,51 +101,60 @@ jobs:
         EKS_CLUSTER_NAME: 'order-manager'
       run: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region ${{ env.AWS_REGION }}
 
-    - name: Set k8s context
-      uses: azure/k8s-set-context@v4
-      with:
-         method: service-account
-         k8s-url: 'https://5FC85553693A9FB969B879E43B276ECA.gr7.us-east-1.eks.amazonaws.com'
-         k8s-secret: ${{ secrets.SQS_SECRET_ACCESS_KEY }}
+    # - name: Set k8s context
+    #   uses: azure/k8s-set-context@v4
+    #   with:
+    #      method: service-account
+    #      k8s-url: 'https://5FC85553693A9FB969B879E43B276ECA.gr7.us-east-1.eks.amazonaws.com'
+    #      k8s-secret: ${{ secrets.SQS_SECRET_ACCESS_KEY }}
 
-    - name: Create SQS Access Key Id
-      uses: Azure/k8s-create-secret@v4.0
-      with:
-        # Choose the target Kubernetes namespace. If the namespace is not provided, the commands will run in the default namespace.
-        namespace: 'default'
-        # Type of Kubernetes secret. Defaults to 'kubernetes.io/dockerconfigjson'.
-        secret-type: 'generic'
-        # Name of the secret. You can use this secret name in the Kubernetes YAML configuration file.
-        secret-name: SQS_ACCESS_KEY_ID
-        # JSON object with the serialized form of the secret data in a base64 encoded string ex: {"key1":"[base64 encoded data]"}
-        data: ${{ secrets.SQS_ACCESS_KEY_ID }}
+    # - name: Create SQS Access Key Id
+    #   uses: Azure/k8s-create-secret@v4.0
+    #   with:
+    #     # Choose the target Kubernetes namespace. If the namespace is not provided, the commands will run in the default namespace.
+    #     namespace: 'default'
+    #     # Type of Kubernetes secret. Defaults to 'kubernetes.io/dockerconfigjson'.
+    #     secret-type: 'generic'
+    #     # Name of the secret. You can use this secret name in the Kubernetes YAML configuration file.
+    #     secret-name: SQS_ACCESS_KEY_ID
+    #     # JSON object with the serialized form of the secret data in a base64 encoded string ex: {"key1":"[base64 encoded data]"}
+    #     data: ${{ secrets.SQS_ACCESS_KEY_ID }}
 
-    - name: Create SQS Secret Access Key
-      uses: Azure/k8s-create-secret@v4.0
-      with:
-        # Choose the target Kubernetes namespace. If the namespace is not provided, the commands will run in the default namespace.
-        namespace: 'default'
-        # Type of Kubernetes secret. Defaults to 'kubernetes.io/dockerconfigjson'.
-        secret-type: 'generic'
-        # Name of the secret. You can use this secret name in the Kubernetes YAML configuration file.
-        secret-name: SQS_SECRET_ACCESS_KEY
-        # JSON object with the serialized form of the secret data in a base64 encoded string ex: {"key1":"[base64 encoded data]"}
-        data: ${{ secrets.SQS_SECRET_ACCESS_KEY }}
+    # - name: Create SQS Secret Access Key
+    #   uses: Azure/k8s-create-secret@v4.0
+    #   with:
+    #     # Choose the target Kubernetes namespace. If the namespace is not provided, the commands will run in the default namespace.
+    #     namespace: 'default'
+    #     # Type of Kubernetes secret. Defaults to 'kubernetes.io/dockerconfigjson'.
+    #     secret-type: 'generic'
+    #     # Name of the secret. You can use this secret name in the Kubernetes YAML configuration file.
+    #     secret-name: SQS_SECRET_ACCESS_KEY
+    #     # JSON object with the serialized form of the secret data in a base64 encoded string ex: {"key1":"[base64 encoded data]"}
+    #     data: ${{ secrets.SQS_SECRET_ACCESS_KEY }}
 
-    - name: Create Mongo Credentials Secret
-      uses: Azure/k8s-create-secret@v4.0
-      with:
-        # Choose the target Kubernetes namespace. If the namespace is not provided, the commands will run in the default namespace.
-        namespace: 'default'
-        # Type of Kubernetes secret. Defaults to 'kubernetes.io/dockerconfigjson'.
-        secret-type: 'generic'
-        # Name of the secret. You can use this secret name in the Kubernetes YAML configuration file.
-        secret-name: MONGO_CONNECTION_STRING
-        # JSON object with the serialized form of the secret data in a base64 encoded string ex: {"key1":"[base64 encoded data]"}
-        data: ${{ secrets.MONGO_CONNECTION_STRING }}
+    # - name: Create Mongo Credentials Secret
+    #   uses: Azure/k8s-create-secret@v4.0
+    #   with:
+    #     # Choose the target Kubernetes namespace. If the namespace is not provided, the commands will run in the default namespace.
+    #     namespace: 'default'
+    #     # Type of Kubernetes secret. Defaults to 'kubernetes.io/dockerconfigjson'.
+    #     secret-type: 'generic'
+    #     # Name of the secret. You can use this secret name in the Kubernetes YAML configuration file.
+    #     secret-name: MONGO_CONNECTION_STRING
+    #     # JSON object with the serialized form of the secret data in a base64 encoded string ex: {"key1":"[base64 encoded data]"}
+    #     data: ${{ secrets.MONGO_CONNECTION_STRING }}
 
     - name: Deploy to EKS
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
+        SQS_SECRET_ACCESS_KEY: ${{ secrets.SQS_SECRET_ACCESS_KEY }}
+        SQS_ACCESS_KEY_ID: ${{ secrets.SQS_ACCESS_KEY_ID }}
+        AWS_REGION: "us-east-1"
+        SQS_URL: "https://sqs.us-east-1.amazonaws.com/975050002971/NEW_ORDER"
+        SQS_NEW_CHARGE_URL: "https://sqs.us-east-1.amazonaws.com/975050002971/NEW_CHARGE"
+        SQS_QUEUE_NAME: "NEW_ORDER"
+        
       run: |
         kubectl apply -f k8s/cloud/
+        kubectl set env deployment/product-ms MONGO_CONNECTION_STRING=$MONGO_CONNECTION_STRING SQS_SECRET_ACCESS_KEY=$SQS_SECRET_ACCESS_KEY SQS_ACCESS_KEY_ID=$SQS_ACCESS_KEY_ID AWS_REGION=$AWS_REGION SQS_URL=$SQS_URL SQS_NEW_CHARGE_URL=$SQS_NEW_CHARGE_URL SQS_QUEUE_NAME=$SQS_QUEUE_NAME
