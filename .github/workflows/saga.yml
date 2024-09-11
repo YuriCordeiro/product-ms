@@ -50,7 +50,17 @@ jobs:
     env:
       AWS_REGION: "us-east-1"
 
-    steps:
+    steps:    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
+      with:
+        aws-access-key-id: ${{ secrets.SQS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.SQS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Show directory files
+      run: ls -ltr
+
     - name: Create Mongo Secret
       run: |
           kubectl create secret generic mongo-credentials \
@@ -67,13 +77,6 @@ jobs:
             -n nginx \
             --dry-run=client -o yaml | kubectl apply -f k8s/cloud/ --insecure-skip-tls-verify --validate=false
             # --dry-run=client -o yaml | kubectl apply -f - --insecure-skip-tls-verify --validate=false
-    
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
-      with:
-        aws-access-key-id: ${{ secrets.SQS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.SQS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
 
     - name: Amazon ECR "Login" Action for GitHub Actions
       id: login-ecr
