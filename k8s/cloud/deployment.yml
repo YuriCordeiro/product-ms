@@ -36,7 +36,7 @@ spec:
           - name: MONGO_CONNECTION_STRIN
             valueFrom:
               configMapKeyRef:
-                name: mongo-credentials
+                name: data
                 key: MONGO_CONNECTION_STRIN
         #   - name: SQS_ACCESS_KEY_ID
         #     valueFrom:
