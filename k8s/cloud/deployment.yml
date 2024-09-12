@@ -19,13 +19,13 @@ spec:
         - containerPort: 3000
         livenessProbe:
           httpGet:
-            path: /
+            path: /products
             port: 3000
           initialDelaySeconds: 40
           periodSeconds: 60
         readinessProbe:
           httpGet:
-            path: /
+            path: /products
             port: 3000
           initialDelaySeconds: 40
         resources:
