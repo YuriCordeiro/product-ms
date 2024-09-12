@@ -11,7 +11,7 @@ import { Product, ProductSchema } from './entities/product.model';
     MongooseModule.forFeature([
       { name: Product.name, schema: ProductSchema }
     ]),
-    MongooseModule.forRoot(process.env.MONGO_CONNECTION_STRING),
+    MongooseModule.forRoot(process.env.MONGO_CONNECTION_STRIN),
   ],
   providers: [
     {

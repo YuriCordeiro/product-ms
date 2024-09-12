@@ -33,11 +33,11 @@ spec:
             cpu: 10m
         imagePullPolicy: Always
         env:
-          - name: MONGO_CONNECTION_STRING
+          - name: MONGO_CONNECTION_STRIN
             valueFrom:
               configMapKeyRef:
                 name: mongo-credentials
-                key: MONGO_CONNECTION_STRING
+                key: MONGO_CONNECTION_STRIN
         #   - name: SQS_ACCESS_KEY_ID
         #     valueFrom:
         #       configMapKeyRef:
