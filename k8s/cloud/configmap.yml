@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: product-ms-config
+data:
+  MONGO_CONNECTION_STRING: mongodb+srv://order-manager-admin:KXdkKCNplaugWJA6@cluster0.uszjg.mongodb.net/product?retryWrites=true&w=majority&appName=Cluster0
+
+
+
