@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductUseCases } from 'src/use-cases/product/product.use-case';
-import { ProductDTO } from 'src/dto/product.dto';
+import { GetProductDTO } from 'src/dto/get-product.dto';
 import { Product } from 'src/frameworks/data-services/mongo/entities/product.model';
 import { ProductController } from 'src/controllers/product.controller';
 
@@ -35,7 +35,7 @@ describe('ProductController', () => {
 
   describe('createProduct', () => {
     it('should create and return a new product', async () => {
-      const productDTO: ProductDTO = {
+      const productDTO: GetProductDTO = {
         name: 'Hamburger',
         sku: '123',
         value: 30,
@@ -95,7 +95,7 @@ describe('ProductController', () => {
   describe('updateProduct', () => {
     it('should update and return the product', async () => {
       const productId = '123';
-      const productDTO: ProductDTO = {
+      const productDTO: GetProductDTO = {
         name: 'Hamburger',
         sku: '123',
         value: 30,

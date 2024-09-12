@@ -7,15 +7,18 @@ import {
 } from '@nestjs/common';
 import { IDataServices } from 'src/core/abstracts/data-services.abstract';
 import { ProductFactoryService } from './product-factory.service';
-import { ProductDTO } from 'src/dto/product.dto';
+import { GetProductDTO } from 'src/dto/get-product.dto';
 import { Product } from 'src/frameworks/data-services/mongo/entities/product.model';
+import { InventoryUseCase } from '../inventory/inventory.use-case';
+import { CreateProductDTO } from 'src/dto/create-product.dto';
 
 @Injectable()
 export class ProductUseCases {
 
   constructor(
     private dataServices: IDataServices,
-    private productFactoryService: ProductFactoryService
+    private productFactoryService: ProductFactoryService,
+    private inventoryUseCase: InventoryUseCase
   ) { }
 
   getAllProducts(): Promise<Product[]> {
@@ -49,17 +52,18 @@ export class ProductUseCases {
     return this.dataServices.products.getBySku(productSku);
   }
 
-  async createProduct(productDTO: ProductDTO): Promise<Product> {
+  async createProduct(productDTO: CreateProductDTO): Promise<Product> {
     const productSKU = productDTO.sku;
     const foundProduct = await this.getProductBySku(productSKU);
     if (foundProduct != null) {
       throw new ConflictException(`There was another product with SKU: ${productSKU}. Try to change it and try again.`);
     }
     const newProduct = this.productFactoryService.createNewProduct(productDTO);
+    this.inventoryUseCase.createProductInventory(productDTO); // Validar uso de fila para processar itens em estoque (faz sentido para o mesmo MS? Acho que não)
     return this.dataServices.products.create(newProduct);
   }
 
-  updateProduct(productId: string, productDTO: ProductDTO): Promise<Product> {
+  updateProduct(productId: string, productDTO: CreateProductDTO): Promise<Product> {
     const newProduct = this.productFactoryService.updateProduct(productDTO);
     return this.dataServices.products.update(productId, newProduct);
   }

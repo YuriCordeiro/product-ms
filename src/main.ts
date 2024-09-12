@@ -1,7 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { RemoveXPoweredByInterceptor } from './remove-x-powered-by.interceptor';
-import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -17,8 +15,6 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.listen(3000);
-  app.useGlobalInterceptors(new RemoveXPoweredByInterceptor());
-  app.use(helmet());
 }
 bootstrap();
 
