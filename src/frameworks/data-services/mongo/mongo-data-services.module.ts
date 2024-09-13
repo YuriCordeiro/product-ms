@@ -13,7 +13,7 @@ import { Inventory, InventorySchema } from './entities/inventory.model';
       { name: Product.name, schema: ProductSchema },
       { name: Inventory.name, schema: InventorySchema }
     ]),
-    MongooseModule.forRoot(process.env.MONGO_CONNECTION_STRIN),
+    MongooseModule.forRoot(process.env.MONGO_CONNECTION_STRING),
   ],
   providers: [
     {

@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InventoryDTO } from 'src/dto/inventory.dto';
 import { Inventory } from 'src/frameworks/data-services/mongo/entities/inventory.model';
+import { Product } from 'src/frameworks/data-services/mongo/entities/product.model';
 
 @Injectable()
 export class InventoryFactoryService {
 
-  createNewInventory(inventoryDTO: InventoryDTO): Inventory {
+  createNewInventory(createdProduct: Product, quantity: number): Inventory {
     const inventory = new Inventory();
-    inventory.product = inventoryDTO.product;
-    inventory.totalAvailable = inventoryDTO.totalAvailable;
+    inventory.product = createdProduct;
+    inventory.totalAvailable = quantity;
+    inventory.totalReserved = 0;
     return inventory;
   }
 

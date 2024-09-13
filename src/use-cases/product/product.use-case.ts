@@ -59,8 +59,10 @@ export class ProductUseCases {
       throw new ConflictException(`There was another product with SKU: ${productSKU}. Try to change it and try again.`);
     }
     const newProduct = this.productFactoryService.createNewProduct(productDTO);
-    this.inventoryUseCase.createProductInventory(productDTO); // Validar uso de fila para processar itens em estoque (faz sentido para o mesmo MS? Acho que não)
-    return this.dataServices.products.create(newProduct);
+    const createdProduct = await this.dataServices.products.create(newProduct);
+    const quantity = productDTO.quantity;
+    this.inventoryUseCase.createProductInventory(createdProduct, quantity); // Validar uso de fila para processar itens em estoque (faz sentido para o mesmo MS? Acho que não)
+    return createdProduct;
   }
 
   updateProduct(productId: string, productDTO: CreateProductDTO): Promise<Product> {

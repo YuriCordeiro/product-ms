@@ -6,6 +6,7 @@ import { Inventory } from "src/frameworks/data-services/mongo/entities/inventory
 import { CreateProductDTO } from "src/dto/create-product.dto";
 import { JOB_TYPES, SQSProducerService } from "src/frameworks/messaging-services/sqs-messaging-services.service";
 import { CreateChargeDTO } from "src/dto/create-charge.dto";
+import { Product } from "src/frameworks/data-services/mongo/entities/product.model";
 
 @Injectable()
 export class InventoryUseCase {
@@ -18,14 +19,13 @@ export class InventoryUseCase {
         private producerService: SQSProducerService
       ) { }
 
-      async createProductInventory(productDTO: CreateProductDTO): Promise<Inventory> {
-        this.logger.log(`createProductInventory(CreateProductDTO) - Adding ${productDTO.quantity}x - '${productDTO.name}' to inventory.`);
-        let inventoryDTO = new InventoryDTO();
-        inventoryDTO.product = productDTO;
-        inventoryDTO.totalAvailable = productDTO.quantity;
-        const newInventory = this.inventoryFactoryService.createNewInventory(inventoryDTO);
-        
-        return await this.dataServices.inventories.create(newInventory);
+      async createProductInventory(createdProduct: Product, quantity: number): Promise<Inventory> {
+        this.logger.log(`createProductInventory(CreateProductDTO) - Adding ${quantity}x - '${createdProduct.name}' to inventory.`);
+        this.logger.log(`Created Product: ${createdProduct}`);
+        const newInventory = this.inventoryFactoryService.createNewInventory(createdProduct, quantity);
+        const createdInventory = await this.dataServices.inventories.create(newInventory);
+        this.logger.log(`Created Inventory: ${createdInventory}`);
+        return createdInventory;
       }
 
       async getAllProductInventories(): Promise<Inventory[]> {
