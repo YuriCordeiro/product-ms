@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: data
-data:
-  MONGO_CONNECTION_STRIN: mongodb+srv://order-manager-admin:KXdkKCNplaugWJA6@cluster0.uszjg.mongodb.net/product?retryWrites=true&w=majority&appName=Cluster0
-
-
-
